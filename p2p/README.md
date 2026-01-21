@@ -1,14 +1,17 @@
-# P2P Module for Headwind MDM
+# P2P Module for Headwind MDM / Revonixo
 
 ## Overview
 
 This module provides peer-to-peer (P2P) networking capabilities for Headwind MDM, enabling distributed content delivery and local device collaboration while maintaining centralized governance through the main server.
+
+**Revonixo Evolution**: This P2P foundation is being extended to support the Revonixo decentralized cloud computing marketplace, enabling rental sessions for remote device access and compute sharing.
 
 ## Architecture
 
 The P2P module follows a **hybrid architecture**:
 - **Central Server**: Maintains authority over authentication, policies, and device management
 - **P2P Network**: Handles content distribution, local sync, and collaborative features
+- **Rental Sessions** (Revonixo): Coordinates host/renter pairings with payment verification and session management
 
 ## Key Components
 
@@ -32,6 +35,13 @@ The P2P module follows a **hybrid architecture**:
 - Content hash verification
 - Encrypted peer-to-peer channels (TLS)
 
+### 5. Rental Session Management (Revonixo)
+- Session lifecycle management (pending/active/expired/terminated)
+- Payment verification integration (Web3/RVX compatible)
+- Host/Renter device pairing
+- P2P handshake coordination
+- Auto-expiration and cleanup
+
 ## Features
 
 ### Implemented
@@ -40,6 +50,9 @@ The P2P module follows a **hybrid architecture**:
 - ✅ JmDNS-based local network discovery
 - ✅ Database schema for P2P data
 - ✅ Configuration properties
+- ✅ Rental session models (RentalSession, HostAvailability)
+- ✅ Rental session service interfaces
+- ✅ Database schema for rental sessions, events, and host marketplace
 
 ### Planned
 - ⏳ P2PService implementation with connection pooling
@@ -48,6 +61,10 @@ The P2P module follows a **hybrid architecture**:
 - ⏳ Hash verification and integrity checks
 - ⏳ TLS-secured peer connections
 - ⏳ REST API for P2P management
+- ⏳ Rental session REST API implementation
+- ⏳ Payment verification integration
+- ⏳ Session expiration scheduler
+- ⏳ Android client app (separate repository)
 - ⏳ Admin dashboard integration
 
 ## Configuration
@@ -227,9 +244,65 @@ mvn test -pl p2p
 4. **Mesh Notifications**: Distributed push notification system
 5. **Log Aggregation**: P2P log collection from remote sites
 
+## Revonixo Rental Sessions
+
+The P2P module now includes server-side infrastructure for the Revonixo marketplace, enabling device rental sessions with secure P2P coordination.
+
+### Key Features
+
+- **Session Management**: Complete lifecycle from creation to termination
+- **Payment Integration**: Web3/RVX payment verification support
+- **P2P Coordination**: Automated handshake between host and renter devices
+- **Auto-Expiration**: Scheduled cleanup of expired sessions
+- **Marketplace**: Host device registration and discovery
+
+### Database Tables
+
+**rental_sessions**: Tracks rental session lifecycle
+- Session ID, host/renter pairing, payment status
+- Start/end timestamps, P2P encryption keys
+- Session status tracking (pending/active/expired/terminated)
+
+**rental_session_events**: Audit trail for all session events
+- Event type, timestamp, metadata
+- Full compliance logging
+
+**host_availability**: Marketplace listings
+- Device availability, hourly rates
+- Device specifications, ratings
+- Availability schedules
+
+### API Documentation
+
+See [RENTAL_SESSION_API.md](RENTAL_SESSION_API.md) for complete REST API documentation including:
+- Session creation and lifecycle management
+- Payment confirmation workflow
+- P2P handshake coordination
+- Host device registration
+- Marketplace search
+
+### Integration Flow
+
+```
+1. Host registers device → Available in marketplace
+2. Renter creates session → Server generates sessionId
+3. Payment confirmed → Server activates session, generates P2P credentials
+4. Devices connect → Secure P2P stream via Netty/Bouncycastle
+5. Session expires → Auto-cleanup triggered
+```
+
+### Next Steps
+
+- Implement REST API endpoints in server module
+- Add payment verification integration
+- Develop session expiration scheduler
+- Create Android client app (Phase 2)
+
 ## Documentation
 
-For comprehensive architecture details, see: [P2P_ARCHITECTURE.md](../P2P_ARCHITECTURE.md)
+For comprehensive architecture details, see:
+- [P2P_ARCHITECTURE.md](../P2P_ARCHITECTURE.md) - Overall P2P architecture
+- [RENTAL_SESSION_API.md](RENTAL_SESSION_API.md) - Rental session REST API documentation
 
 ## License
 
