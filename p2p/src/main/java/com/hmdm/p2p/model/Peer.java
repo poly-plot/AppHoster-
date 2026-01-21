@@ -37,6 +37,15 @@ public class Peer {
     private long lastSeen;
     private boolean isSuperNode;
     private PeerStatus status;
+    
+    // Global networking fields for DHT and NAT traversal
+    private String publicIpAddress;
+    private Integer publicPort;
+    private String dhtId;
+    private String publicKey;
+    private String stunServer;
+    private String turnServer;
+    private boolean behindNat;
 
     public enum PeerStatus {
         DISCOVERED,
@@ -126,6 +135,62 @@ public class Peer {
 
     public void setStatus(PeerStatus status) {
         this.status = status;
+    }
+
+    public String getPublicIpAddress() {
+        return publicIpAddress;
+    }
+
+    public void setPublicIpAddress(String publicIpAddress) {
+        this.publicIpAddress = publicIpAddress;
+    }
+
+    public Integer getPublicPort() {
+        return publicPort;
+    }
+
+    public void setPublicPort(Integer publicPort) {
+        this.publicPort = publicPort;
+    }
+
+    public String getDhtId() {
+        return dhtId;
+    }
+
+    public void setDhtId(String dhtId) {
+        this.dhtId = dhtId;
+    }
+
+    public String getPublicKey() {
+        return publicKey;
+    }
+
+    public void setPublicKey(String publicKey) {
+        this.publicKey = publicKey;
+    }
+
+    public String getStunServer() {
+        return stunServer;
+    }
+
+    public void setStunServer(String stunServer) {
+        this.stunServer = stunServer;
+    }
+
+    public String getTurnServer() {
+        return turnServer;
+    }
+
+    public void setTurnServer(String turnServer) {
+        this.turnServer = turnServer;
+    }
+
+    public boolean isBehindNat() {
+        return behindNat;
+    }
+
+    public void setBehindNat(boolean behindNat) {
+        this.behindNat = behindNat;
     }
 
     @Override

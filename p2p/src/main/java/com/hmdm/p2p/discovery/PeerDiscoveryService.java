@@ -27,6 +27,7 @@ import java.util.function.Consumer;
 
 /**
  * Service for discovering peers on the network
+ * Supports hybrid discovery: local (mDNS) and global (DHT)
  */
 public interface PeerDiscoveryService {
     
@@ -56,4 +57,36 @@ public interface PeerDiscoveryService {
      * Stop the current peer scan
      */
     void stopScanning();
+    
+    /**
+     * Get discovery method (local, global, hybrid)
+     * @return discovery method
+     */
+    DiscoveryMethod getDiscoveryMethod();
+    
+    /**
+     * Scan for global peers using DHT
+     * @param callback callback to be invoked for each discovered peer
+     */
+    void scanForGlobalPeers(Consumer<Peer> callback);
+    
+    /**
+     * Register this peer in the global DHT
+     * @param peer peer information with global metadata
+     * @return true if registration successful
+     */
+    boolean registerInGlobalDHT(Peer peer);
+    
+    /**
+     * Lookup a peer in the global DHT by DHT ID
+     * @param dhtId the DHT identifier
+     * @return peer information or null if not found
+     */
+    Peer lookupPeerByDhtId(String dhtId);
+    
+    public enum DiscoveryMethod {
+        LOCAL_ONLY,    // mDNS only
+        GLOBAL_ONLY,   // DHT only
+        HYBRID         // Both mDNS and DHT
+    }
 }

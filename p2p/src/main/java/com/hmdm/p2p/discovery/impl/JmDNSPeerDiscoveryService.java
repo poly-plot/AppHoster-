@@ -189,4 +189,29 @@ public class JmDNSPeerDiscoveryService implements PeerDiscoveryService {
         }
         return null;
     }
+    
+    @Override
+    public DiscoveryMethod getDiscoveryMethod() {
+        return DiscoveryMethod.LOCAL_ONLY;
+    }
+    
+    @Override
+    public void scanForGlobalPeers(Consumer<Peer> callback) {
+        // JmDNS only supports local network discovery
+        logger.warn("Global peer scanning not supported by JmDNS - use HybridPeerDiscoveryService");
+    }
+    
+    @Override
+    public boolean registerInGlobalDHT(Peer peer) {
+        // JmDNS does not support global DHT registration
+        logger.warn("Global DHT registration not supported by JmDNS - use HybridPeerDiscoveryService");
+        return false;
+    }
+    
+    @Override
+    public Peer lookupPeerByDhtId(String dhtId) {
+        // JmDNS does not support DHT lookup
+        logger.warn("DHT lookup not supported by JmDNS - use HybridPeerDiscoveryService");
+        return null;
+    }
 }

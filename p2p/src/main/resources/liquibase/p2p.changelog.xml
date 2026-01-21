@@ -41,12 +41,21 @@
                 capabilities JSONB,
                 last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 is_super_node BOOLEAN DEFAULT FALSE,
+                public_ip_address VARCHAR(45),
+                public_port INTEGER,
+                dht_id VARCHAR(128),
+                public_key TEXT,
+                stun_server VARCHAR(255),
+                turn_server VARCHAR(255),
+                behind_nat BOOLEAN DEFAULT FALSE,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
             
             CREATE INDEX idx_peers_device ON peers(device_id);
             CREATE INDEX idx_peers_last_seen ON peers(last_seen);
             CREATE INDEX idx_peers_super_node ON peers(is_super_node) WHERE is_super_node = TRUE;
+            CREATE INDEX idx_peers_dht_id ON peers(dht_id);
+            CREATE INDEX idx_peers_public_ip ON peers(public_ip_address);
         </sql>
         <rollback>
             DROP TABLE IF EXISTS peers;
