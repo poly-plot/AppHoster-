@@ -18,6 +18,7 @@ Headwind MDM is a Mobile Device Management platform for Android devices, designe
  - Extensible platform design allowing the custom plugin development
  - Collection of application logs in the web panel
  - Centralized configuration of corporate applications
+ - **NEW**: Peer-to-peer (P2P) content distribution for reduced bandwidth and improved performance
 
 The *Enterprise edition* of the platform has more features:
 
@@ -52,5 +53,20 @@ Please contact us on the [project website](https://h-mdm.com) if you'd like to:
  - order the custom development
  - report a bug
 
+## P2P Architecture
+
+Headwind MDM now includes an **experimental peer-to-peer (P2P) module** that enables hybrid client-server and P2P architecture:
+
+- **Distributed Content Delivery**: Application files can be shared between devices on the same local network
+- **Reduced Bandwidth**: 60-80% reduction in server bandwidth for app distribution
+- **Improved Performance**: Faster downloads using local network speeds
+- **Enhanced Resilience**: Continues functioning during server outages
+- **Maintained Governance**: Central server retains control over authentication and policies
+
+For detailed information, see:
+- [P2P Architecture Documentation](P2P_ARCHITECTURE.md)
+- [P2P Module Documentation](p2p/README.md)
+
+**Note**: P2P features are experimental and disabled by default. Enable with `p2p.enabled=true` in configuration.
 
 
