@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~ Headwind MDM: Open Source Android MDM Software
+  ~ https://h-mdm.com
+  ~
+  ~ Copyright (C) 2019 Headwind Solutions LLC (http://h-sms.com)
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~       http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  ~
+  -->
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd"
+        logicalFilePath="p2p.changelog.xml">
+
+    <changeSet id="26.01.21-00:01" author="copilot" context="common">
+        <comment>Create peers table for P2P networking</comment>
+        <sql>
+            CREATE TABLE peers (
+                id SERIAL PRIMARY KEY,
+                device_id INTEGER REFERENCES devices(id) ON DELETE CASCADE,
+                peer_id VARCHAR(64) UNIQUE NOT NULL,
+                ip_address VARCHAR(45),
+                port INTEGER,
+                certificate TEXT,
+                capabilities JSONB,
+                last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                is_super_node BOOLEAN DEFAULT FALSE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+            
+            CREATE INDEX idx_peers_device ON peers(device_id);
+            CREATE INDEX idx_peers_last_seen ON peers(last_seen);
+            CREATE INDEX idx_peers_super_node ON peers(is_super_node) WHERE is_super_node = TRUE;
+        </sql>
+        <rollback>
+            DROP TABLE IF EXISTS peers;
+        </rollback>
+    </changeSet>
+
+    <changeSet id="26.01.21-00:02" author="copilot" context="common">
+        <comment>Create p2p_content_cache table for content distribution</comment>
+        <sql>
+            CREATE TABLE p2p_content_cache (
+                id SERIAL PRIMARY KEY,
+                peer_id INTEGER REFERENCES peers(id) ON DELETE CASCADE,
+                content_hash VARCHAR(64) NOT NULL,
+                content_type VARCHAR(32) NOT NULL,
+                size_bytes BIGINT NOT NULL,
+                file_name VARCHAR(255),
+                metadata TEXT,
+                added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                last_accessed TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                access_count INTEGER DEFAULT 0
+            );
+            
+            CREATE INDEX idx_p2p_cache_hash ON p2p_content_cache(content_hash);
+            CREATE INDEX idx_p2p_cache_peer ON p2p_content_cache(peer_id);
+            CREATE INDEX idx_p2p_cache_type ON p2p_content_cache(content_type);
+            CREATE INDEX idx_p2p_cache_last_accessed ON p2p_content_cache(last_accessed);
+        </sql>
+        <rollback>
+            DROP TABLE IF EXISTS p2p_content_cache;
+        </rollback>
+    </changeSet>
+
+    <changeSet id="26.01.21-00:03" author="copilot" context="common">
+        <comment>Create p2p_transfers table for analytics and monitoring</comment>
+        <sql>
+            CREATE TABLE p2p_transfers (
+                id SERIAL PRIMARY KEY,
+                source_peer_id INTEGER REFERENCES peers(id) ON DELETE SET NULL,
+                dest_device_id INTEGER REFERENCES devices(id) ON DELETE CASCADE,
+                content_hash VARCHAR(64) NOT NULL,
+                bytes_transferred BIGINT NOT NULL,
+                transfer_time_ms INTEGER NOT NULL,
+                completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                success BOOLEAN NOT NULL DEFAULT TRUE,
+                error_message TEXT
+            );
+            
+            CREATE INDEX idx_p2p_transfers_time ON p2p_transfers(completed_at);
+            CREATE INDEX idx_p2p_transfers_source ON p2p_transfers(source_peer_id);
+            CREATE INDEX idx_p2p_transfers_dest ON p2p_transfers(dest_device_id);
+            CREATE INDEX idx_p2p_transfers_hash ON p2p_transfers(content_hash);
+            CREATE INDEX idx_p2p_transfers_success ON p2p_transfers(success);
+        </sql>
+        <rollback>
+            DROP TABLE IF EXISTS p2p_transfers;
+        </rollback>
+    </changeSet>
+
+    <changeSet id="26.01.21-00:04" author="copilot" context="common">
+        <comment>Create p2p_statistics table for aggregate metrics</comment>
+        <sql>
+            CREATE TABLE p2p_statistics (
+                id SERIAL PRIMARY KEY,
+                date DATE NOT NULL,
+                total_transfers INTEGER DEFAULT 0,
+                successful_transfers INTEGER DEFAULT 0,
+                failed_transfers INTEGER DEFAULT 0,
+                total_bytes_transferred BIGINT DEFAULT 0,
+                total_bandwidth_saved BIGINT DEFAULT 0,
+                avg_transfer_time_ms INTEGER DEFAULT 0,
+                active_peers INTEGER DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                CONSTRAINT unique_date UNIQUE (date)
+            );
+            
+            CREATE INDEX idx_p2p_stats_date ON p2p_statistics(date);
+        </sql>
+        <rollback>
+            DROP TABLE IF EXISTS p2p_statistics;
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>
