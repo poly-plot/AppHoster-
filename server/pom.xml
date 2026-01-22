@@ -99,6 +99,21 @@
         </dependency>
 
         <dependency><groupId>com.hmdm.plugin</groupId><artifactId>push</artifactId><version>0.1.0</version><scope>runtime</scope></dependency>
+        
+        <!-- WebSocket API for signaling server -->
+        <dependency>
+            <groupId>javax.websocket</groupId>
+            <artifactId>javax.websocket-api</artifactId>
+            <version>1.1</version>
+            <scope>provided</scope>
+        </dependency>
+        
+        <!-- P2P module for rental session management -->
+        <dependency>
+            <groupId>com.hmdm</groupId>
+            <artifactId>p2p</artifactId>
+            <version>0.1.0</version>
+        </dependency>
     </dependencies>
 
     <build>
